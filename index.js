@@ -1,6 +1,7 @@
 process.env.NTBA_FIX_319 = 1
 const TelegramApi = require('node-telegram-bot-api')
 const gameOptions = require('./options')
+const mongoose = require('mongoose')
 
 
 const token = '2045807538:AAH5bnOdR08eGGJvZOTrW4J8PCDnec2CooU'
@@ -17,7 +18,20 @@ const startGame = async (chatId) => {
     await bot.sendMessage(chatId, 'Отгадывай', gameOptions.keyboard)
 }
 
-const run = () => {
+const run = async () => {
+
+    try{
+        await mongoose.connect('mongodb+srv://admin:admin@cluster0.ysuxx.mongodb.net/telegram-game-bot?retryWrites=true&w=majority', {
+            useNewUrlParser: true,
+            // useCreateIndex: true,
+            useUnifiedTopology: true
+        })
+        console.log('Подключено к бд')
+    }catch(e){
+        console.log('Не подключено к бд!')
+    }
+
+
     bot.setMyCommands([
         { command: '/start', description: 'Начальное приветсвие' },
         { command: '/info', description: 'Информация' },
