@@ -35,8 +35,9 @@ const run = async () => {
 
     bot.setMyCommands([
         { command: '/start', description: 'Начальное приветсвие' },
-        { command: '/info', description: 'Информация' },
-        { command: '/game', description: 'Начать игру' }
+        { command: '/info', description: 'Игровая статистка' },
+        { command: '/game', description: 'Начать игру' },
+        { command: '/reset', description: 'Сбросить статистику' }
     ])
 
     bot.on('message', async (msg) => {
@@ -63,6 +64,12 @@ const run = async () => {
 
         if(command === '/game'){
             return startGame(chatId)
+        }
+
+        if(command === '/reset'){
+            await ChatInfo.updateOne({ chatId }, { right: 0, wrong: 0 })
+            await bot.sendMessage(chatId, 'Статистика успешно сброшена!')
+            return
         }
     
         await bot.sendMessage(chatId, 'Я тебя не понимаю!')
