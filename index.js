@@ -41,6 +41,22 @@ const run = () => {
         await bot.sendMessage(chatId, 'Я тебя не понимаю!')
         return
     })
+
+    bot.on('callback_query', async (callback_data) => {
+
+        const data = callback_data.data
+        const chatId = callback_data.message.chat.id
+
+        const botNumber = chats[chatId]
+
+        if(+data === botNumber){
+            await bot.sendMessage(chatId, `Правильно! Это ${botNumber}!`)
+            return 
+        }
+
+        await bot.sendMessage(chatId, `Упс, не правильно! Я загадал число ${botNumber}!`)
+        return 
+    })
 }
 
 run()
