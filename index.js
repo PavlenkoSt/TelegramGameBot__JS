@@ -9,6 +9,14 @@ const bot = new TelegramApi(token, { polling: true })
 
 const chats = {}
 
+
+const startGame = async (chatId) => {
+    await bot.sendMessage(chatId, 'Сейчас я загадаю число от 0 до 9, а тебе нужно будет его отгадать.')
+    const randomNum = Math.floor(Math.random() * 10)
+    chats[chatId] = randomNum
+    await bot.sendMessage(chatId, 'Отгадывай', gameOptions.keyboard)
+}
+
 const run = () => {
     bot.setMyCommands([
         { command: '/start', description: 'Начальное приветсвие' },
@@ -22,7 +30,7 @@ const run = () => {
 
         if(command === '/start'){
             await bot.sendMessage(chatId, 'Приветствую, меня зовут Игробот! Чем могу помочь?')
-            return
+            return 
         }
     
         if(command === '/info'){
@@ -31,11 +39,7 @@ const run = () => {
         }
 
         if(command === '/game'){
-            await bot.sendMessage(chatId, 'Сейчас я загадаю число от 0 до 9, а тебе нужно будет его отгадать.')
-            const randomNum = Math.floor(Math.random() * 10)
-            chats[chatId] = randomNum
-            await bot.sendMessage(chatId, 'Отгадывай', gameOptions)
-            return
+            return startGame(chatId)
         }
     
         await bot.sendMessage(chatId, 'Я тебя не понимаю!')
@@ -47,14 +51,18 @@ const run = () => {
         const data = callback_data.data
         const chatId = callback_data.message.chat.id
 
+        if(data === '/again'){
+            return startGame(chatId)
+        }
+
         const botNumber = chats[chatId]
 
         if(+data === botNumber){
-            await bot.sendMessage(chatId, `Правильно! Это ${botNumber}!`)
+            await bot.sendMessage(chatId, `Правильно! Это ${botNumber}!`, gameOptions.again)
             return 
         }
 
-        await bot.sendMessage(chatId, `Упс, не правильно! Я загадал число ${botNumber}!`)
+        await bot.sendMessage(chatId, `Упс, не правильно! Я загадал число ${botNumber}!`, gameOptions.again)
         return 
     })
 }
