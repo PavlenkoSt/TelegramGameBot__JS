@@ -1,5 +1,6 @@
 process.env.NTBA_FIX_319 = 1
 const TelegramApi = require('node-telegram-bot-api')
+const gameOptions = require('./options')
 
 
 const token = '2045807538:AAH5bnOdR08eGGJvZOTrW4J8PCDnec2CooU'
@@ -14,14 +15,6 @@ const run = () => {
         { command: '/info', description: 'Информация' },
         { command: '/game', description: 'Начать игру' }
     ])
-
-    const gameOptions = {
-        reply_markup: JSON.stringify({
-            inline_keyboard: [
-                [{ text: '1', callback_data: '1' }]
-            ]
-        })
-    }
 
     bot.on('message', async (msg) => {
         const chatId = msg.chat.id
