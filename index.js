@@ -2,6 +2,7 @@ process.env.NTBA_FIX_319 = 1
 const TelegramApi = require('node-telegram-bot-api')
 const gameOptions = require('./options')
 const mongoose = require('mongoose')
+const ChatInfo = require('./ChatInfoSchema')
 
 
 const token = '2045807538:AAH5bnOdR08eGGJvZOTrW4J8PCDnec2CooU'
@@ -43,12 +44,20 @@ const run = async () => {
         const command = msg.text
 
         if(command === '/start'){
+            const isExist = await ChatInfo.findOne({ chatId })
+
+            if(isExist){
+                await ChatInfo.deleteOne(isExist)
+            }
+
+            await ChatInfo.create({ chatId, right: 0, wrong: 0 })
             await bot.sendMessage(chatId, 'Приветствую, меня зовут Игробот! Чем могу помочь?')
             return 
         }
     
         if(command === '/info'){
-            await bot.sendMessage(chatId, `Тебя зовут ${msg.chat.first_name} ${msg.chat.last_name}!`)
+            const chatInfo = await ChatInfo.findOne({ chatId })
+            await bot.sendMessage(chatId, `Тебя зовут ${msg.chat.first_name} ${msg.chat.last_name}! Удачно отгадано: ${chatInfo.right}, не отгадано: ${chatInfo.wrong}!`)
             return
         }
 
@@ -70,12 +79,16 @@ const run = async () => {
         }
 
         const botNumber = chats[chatId]
+        
+        const chatInfo = await ChatInfo.findOne({ chatId })
 
         if(+data === botNumber){
+            await ChatInfo.updateOne(chatInfo, { right: chatInfo.right + 1 })
             await bot.sendMessage(chatId, `Правильно! Это ${botNumber}!`, gameOptions.again)
             return 
         }
 
+        await ChatInfo.updateOne(chatInfo, { wrong: chatInfo.wrong + 1 })
         await bot.sendMessage(chatId, `Упс, не правильно! Я загадал число ${botNumber}!`, gameOptions.again)
         return 
     })

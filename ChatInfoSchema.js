@@ -6,4 +6,4 @@ const schema = new Schema({
     wrong: Number
 })
 
-module.exports = model('userInfo', schema)
+module.exports = model('chatInfo', schema)
